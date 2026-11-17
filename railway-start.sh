@@ -11,9 +11,6 @@ export PORT="${PORT:-8080}"
 export LANGUAGE="${LANGUAGE:-english}"
 export DEBUG_MODE="${DEBUG_MODE:-false}"
 export DB_PORT="${DB_PORT:-3306}"
-# Railway's edge proxy reaches the container from a private address; trust its
-# X-Forwarded-For so rate limits and logs see the visitor's IP, not the proxy's.
-export PROXY_IPS="${PROXY_IPS:-10.0.0.0/8,100.64.0.0/10,172.16.0.0/12,192.168.0.0/16}"
 if [ -z "${BASE_URL:-}" ] && [ -n "${RAILWAY_PUBLIC_DOMAIN:-}" ]; then
     export BASE_URL="https://${RAILWAY_PUBLIC_DOMAIN}"
 fi
@@ -94,6 +91,8 @@ chown -R www-data:www-data "$APP/storage"
 # ("AH00534: More than one MPM loaded"). mod_php needs prefork only.
 rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.*
 [ -e /etc/apache2/mods-enabled/mpm_prefork.load ] || a2enmod -q mpm_prefork
+# mod_remoteip takes the visitor's IP from Railway's X-Real-IP (see railway-remoteip.conf).
+[ -e /etc/apache2/mods-enabled/remoteip.load ] || a2enmod -q remoteip
 
 # After an image update, apply pending database migrations, but only on an
 # installed instance (on an empty database the installation page does this).

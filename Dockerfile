@@ -5,6 +5,10 @@ FROM alextselegidis/easyappointments:1.6.1@sha256:6d3a927dc16db11827018bcbc708e6
 # Production PHP settings (the upstream image ships with xdebug in debug mode).
 COPY zz-railway.ini /usr/local/etc/php/conf.d/zz-railway.ini
 
+# Real client IP from Railway's proxy (see remoteip.conf).
+COPY remoteip.conf /etc/apache2/conf-available/railway-remoteip.conf
+RUN a2enmod remoteip && a2enconf railway-remoteip
+
 # Health check for Railway: answers 200 only when PHP and MySQL are reachable.
 COPY healthz.php /var/www/html/healthz/index.php
 

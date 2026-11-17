@@ -19,7 +19,8 @@ On the first visit the app opens its installation page, where you create the adm
 
 The wrapper is small:
 
-- [`railway-start.sh`](railway-start.sh) writes `config.php` and the email config from the service variables at every start (values are escaped by PHP), seeds the storage volume on first boot, applies pending database migrations after an update, makes Apache listen on `PORT`, trusts Railway's proxy for client IPs and starts Apache.
+- [`railway-start.sh`](railway-start.sh) writes `config.php` and the email config from the service variables at every start (values are escaped by PHP), seeds the storage volume on first boot, applies pending database migrations after an update, makes Apache listen on `PORT` and starts Apache.
+- [`remoteip.conf`](remoteip.conf) makes Apache take the visitor's IP from Railway's `X-Real-IP` header. Easy!Appointments ties each login session to the client IP, and behind Railway's proxy every request would otherwise come from a different internal address and log you out.
 - [`healthz.php`](healthz.php) answers `200` on `/healthz/` when the database is reachable, `503` otherwise.
 - [`zz-railway.ini`](zz-railway.ini) turns off the upstream image's xdebug and PHP error display.
 
